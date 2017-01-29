@@ -1,0 +1,13 @@
+Package: RTutorTeacher
+Type: Package
+Title: Teacher Panel for RTutor
+Version: 0.1.0
+Author: Sebastian Kranz
+Maintainer: Sebastian Krant <sebastian.kranz@uni-ulm.de>
+Description: Panel to start and manage presentations with clickers and problemsets
+License: GPL >= 2.0
+LazyData: TRUE
+Depends:
+  restorepoint, shinyEvents, stringtools, rmdtools, yaml,
+  shinyEventsUI, shinyEventsLogin,
+  RTutor3, armd
