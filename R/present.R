@@ -59,6 +59,8 @@ token.dir = "',token.dir,'"
 
 app = presenterApp(slides.dir=slides.dir, token.dir=token.dir, clicker.dir=clicker.dir, teacher=teacher)
 
+appReadyToRun(app)
+
 shinyApp(ui = app$ui, server = app$server)
 ')
   app.file = file.path(app.dir, "app.R")

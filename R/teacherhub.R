@@ -6,7 +6,10 @@ examples.teacherhub = function() {
   app = TeacherHubApp(tgroup.dir=tgroup.dir,init.userid="kranz", need.password=FALSE, need.user=FALSE)
   res = viewApp(app)
 
+  #res = "D:/libraries/RTutorTeacher/teacherhub/tgroups/kranz/shiny-server/present/teachers/kranz/courses/vwl/slides/2-chapter2b/app"
+
   if (dir.exists(res)) {
+    restore.point.options(display.restore.point = TRUE)
     shiny::runApp(res,launch.browser = rstudioapi::viewer)
   }
 }
