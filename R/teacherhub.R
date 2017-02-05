@@ -49,6 +49,7 @@ TeacherHubApp = function(tgroup.dir, login.db.dir=NULL, app.title="RTutor Teache
   glob$opts = yaml.load_file(file.path(tgroup.dir,"settings/settings.yaml"))
 
 
+
   glob$tgroup.dir = tgroup.dir
 
 
@@ -180,6 +181,9 @@ teacher.hub.modify.file.tree.nodes = function(cur.dir, label.nodes, head.nodes, 
     file.nodes$col2 = file.nodes$col3 = ""
   # main folder of a course
   } else if (below==1) {
+    courseid = folders[1]
+    app$courseid = courseid
+
     label.nodes$title = folders[1]
     label.nodes$col2 = label.nodes$col3 = ""
 
@@ -208,19 +212,7 @@ teacher.hub.modify.file.tree.nodes = function(cur.dir, label.nodes, head.nodes, 
   nlist(label.nodes, head.nodes, file.nodes)
 }
 
-th.upload.files = function(update.id, courseid,...) {
-  restore.point("th.upload.files")
-
-  source.dir = value$data.path
-  dest.dir = file.path(th$course.dir,type,el)
-  # copy uploaded files
-  file.copy(from=source.dir, to=dest.dir, recursive=TRUE)
-  # update tree
-  th.show.course(courseid)
-
-}
-
-th.show.slides.click = function(data,..., app=getApp(), th=app$th) {
+th.show.slides.click = function(data,..., courseid = app$courseid, app=getApp(), th=app$th) {
   restore.point("th.show.slides.click")
   slides = data$slide
   slides.dir = data$dir
@@ -232,7 +224,14 @@ th.show.slides.click = function(data,..., app=getApp(), th=app$th) {
 
   app.base.dir = paste0(shiny.dir, file.path.diff(slides.dir, app$glob$tgroup.dir))
 
-  app.dir = makePresenterAppDir(hash="app",app.base.dir = app.base.dir,slides.dir = slides.dir,clicker.dir = opts$present$clicker.dir)
+  clicker.dir = opts$clicker$clicker.dir
+
+
+  app.dir = makePresenterAppDir(courseid=courseid,hash="app",app.base.dir = app.base.dir,slides.dir = slides.dir,clicker.dir = clicker.dir)
+
+  # add course to clicker
+   write.clicker.running(courseid = courseid,clicker.dir = clicker.dir)
+
 
   if (isTRUE(opts$local)) {
     stopApp(app.dir)
