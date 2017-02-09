@@ -3,7 +3,7 @@ examples.teacherhub = function() {
   restore.point.options(display.restore.point = TRUE)
 
   tgroup.dir = "D:/libraries/RTutorTeacher/teacherhub/tgroups/kranz"
-  app = TeacherHubApp(tgroup.dir=tgroup.dir,init.userid="kranz", need.password=FALSE, need.user=FALSE)
+  app = TeacherHubApp(tgroup.dir=tgroup.dir,init.userid="kranz", need.password=FALSE, need.user=TRUE, fixed.password="ompo", use.signup=FALSE)
   res = viewApp(app)
 
   #res = "D:/libraries/RTutorTeacher/teacherhub/tgroups/kranz/shiny-server/present/teachers/kranz/courses/vwl/slides/2-chapter2b/app"
