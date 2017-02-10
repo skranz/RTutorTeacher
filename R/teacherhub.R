@@ -232,11 +232,13 @@ th.show.slides.click = function(data,..., courseid = app$courseid, app=getApp(),
   # add course to clicker
    write.clicker.running(courseid = courseid,clicker.dir = clicker.dir)
 
+   url = paste0(opts$base.url,":", opts$present$port, "/present/teachers/", app$th$userid,"/courses/", courseid,"/slides/",slides,"/app")
 
   if (isTRUE(opts$local)) {
     stopApp(app.dir)
   } else {
     # open app website
+    open.url.from.app(url)
   }
 
 }

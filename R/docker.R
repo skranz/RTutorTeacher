@@ -9,7 +9,7 @@ examples.run.docker.container = function() {
   #th.run.docker.container(tgroup.dir)
 }
 
-th.make.docker.script = function(tgroup.dir, tag="latest",   opts = yaml.load_file(file.path(tgroup.dir,"settings","settings.yaml"))) {
+th.make.docker.script = function(tgroup.dir, opts = yaml.load_file(file.path(tgroup.dir,"settings","settings.yaml")), image="skranz/rtutorteacher_man") {
   restore.point("run.docker.container")
 
 
@@ -25,14 +25,20 @@ th.make.docker.script = function(tgroup.dir, tag="latest",   opts = yaml.load_fi
 
   code = paste0(
 "# Run TeacherHub Docker containers
-docker pull skranz/rtutorteacher:",tag)
+docker pull ", image,"
+
+# For rstudio support adapt and add to docker run
+-p 8711:8787 -e ROOT=TRUE -e USER=admin -e PASSWORD=<yourpassword> -e RUN_RSTUDIO=yes
+")
+
+
 
   # teacherhub
   field = "teacherhub"
   name = opts[[field]]$container
   port = opts[[field]]$port
 
-  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/home/srv/tgroup -v ', log.dir,':/var/log/ skranz/rtutorteacher:',tag)
+  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/srv/tgroup -v ', log.dir,':/var/log/ ',image)
 
   code = c(code,"",paste0("# ", field), paste0("docker stop ", name),paste0("docker rm ", name), run.com)
 
@@ -41,7 +47,7 @@ docker pull skranz/rtutorteacher:",tag)
   name = opts[[field]]$container
   port = opts[[field]]$port
 
-  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',teachers.dir,':/srv/teachers -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ skranz/rtutorteacher:',tag)
+  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',teachers.dir,':/srv/teachers -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ ',image)
 
   code = c(code,"",paste0("# ", field), paste0("docker stop ", name),paste0("docker rm ", name), run.com)
 
@@ -51,7 +57,7 @@ docker pull skranz/rtutorteacher:",tag)
   name = opts[[field]]$container
   port = opts[[field]]$port
 
-  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,'  -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ skranz/rtutorteacher:',tag)
+  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,'  -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ ',image)
 
   code = c(code,"",paste0("# ", field), paste0("docker stop ", name),paste0("docker rm ", name), run.com)
 
@@ -81,7 +87,7 @@ th.run.docker.container = function(tgroup.dir, tag="latest") {
   name = opts[[field]]$container
   port = opts[[field]]$port
 
-  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/home/srv/tgroup -v ', log.dir,':/var/log/ skranz/RTutorTeacher:',tag)
+  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/srv/tgroup -v ', log.dir,':/var/log/ skranz/RTutorTeacher:',tag)
 
   rerun.container(name, run.com)
 
