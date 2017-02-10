@@ -46,13 +46,8 @@ TeacherHubApp = function(tgroup.dir, login.db.dir=NULL, app.title="RTutor Teache
 
   glob = app$glob
 
-  glob$opts = yaml.load_file(file.path(tgroup.dir,"settings/settings.yaml"))
-
-
-
+  glob$opts = init.th.opts(tgroup.dir)
   glob$tgroup.dir = tgroup.dir
-
-
   db.arg = list(dbname=paste0(login.db.dir,"/userDB.sqlite"),drv=SQLite())
 
   lop = loginModule(db.arg = db.arg, login.fun=teacher.hub.login, app.title=app.title,container.id = "centerUI",...)
@@ -67,10 +62,31 @@ TeacherHubApp = function(tgroup.dir, login.db.dir=NULL, app.title="RTutor Teache
   app
 }
 
+init.th.opts = function(tgroup.dir, file = file.path(tgroup.dir,"settings/settings.yaml")) {
+  opts$tgroup.dir = tgroup.dir
+  opts = yaml.load_file(file)
+
+  if (isTRUE(opts$local)) {
+    opts$base_url = "localhost"
+    opts$clicker.dir = file.path(tgroup.dir,"clicker")
+    opts$teachers.dir = file.path(tgroup.dir,"teachers")
+    opts$present.shiny.dir = file.path(tgroup.dir,"shiny-server","present")
+  } else {
+    opts$local = FALSE
+    opts$clicker.dir = "/srv/clicker"
+    opts$teachers.dir = "/srv/teachers"
+    opts$present.shiny.dir = "/srv/present"
+  }
+  opts$clicker$url = paste0(opts$base_url,":",opts$clicker$port,"/clicker")
+
+  opts
+}
+
 teacher.hub.login = function(userid,app=getApp(),...) {
   restore.point("teacher.hub.login")
 
   tgroup.dir = app$glob$tgroup.dir
+
   user.dir = file.path(tgroup.dir,"teachers",userid)
   courses.dir = file.path(user.dir, "courses")
   courseids = list.dirs(courses.dir, full.names=FALSE, recursive=FALSE)
@@ -217,6 +233,7 @@ th.show.slides.click = function(data,..., courseid = app$courseid, app=getApp(),
   slides = data$slide
   slides.dir = data$dir
 
+
   opts = app$glob$opts
 
   shiny.dir = first.non.null(opts$present$shiny.dir,"/srv/shiny-server/present")
@@ -224,15 +241,19 @@ th.show.slides.click = function(data,..., courseid = app$courseid, app=getApp(),
 
   app.base.dir = paste0(shiny.dir, file.path.diff(slides.dir, app$glob$tgroup.dir))
 
-  clicker.dir = opts$clicker$clicker.dir
+  if (!opts$local) {
+    slides.dir = file.path()
+  }
+
+  clicker.dir = opts$clicker.dir
 
 
-  app.dir = makePresenterAppDir(courseid=courseid,hash="app",app.base.dir = app.base.dir,slides.dir = slides.dir,clicker.dir = clicker.dir)
+  app.dir = makePresenterAppDir(courseid=courseid,slides=slides,teacher=th$userid, hash="app", opts=opts)
 
   # add course to clicker
    write.clicker.running(courseid = courseid,clicker.dir = clicker.dir)
 
-   url = paste0(opts$base.url,":", opts$present$port, "/present/teachers/", app$th$userid,"/courses/", courseid,"/slides/",slides,"/app")
+   url = paste0(opts$base_url,":", opts$present$port, "/present/teachers/", app$th$userid,"/courses/", courseid,"/slides/",slides,"/app/s")
 
   if (isTRUE(opts$local)) {
     stopApp(app.dir)

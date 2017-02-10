@@ -9,7 +9,7 @@ examples.run.docker.container = function() {
   #th.run.docker.container(tgroup.dir)
 }
 
-th.make.docker.script = function(tgroup.dir, opts = yaml.load_file(file.path(tgroup.dir,"settings","settings.yaml")), image="skranz/rtutorteacher_man") {
+th.make.docker.script = function(tgroup.dir, opts = yaml.load_file(file.path(tgroup.dir,"settings","settings.yaml")), image="skranz/rtutorteacher_man", use.rstudio = TRUE) {
   restore.point("run.docker.container")
 
 
@@ -20,6 +20,7 @@ th.make.docker.script = function(tgroup.dir, opts = yaml.load_file(file.path(tgr
   shiny.dir = file.path(tgroup.dir,"shiny-server")
   teachers.dir = file.path(tgroup.dir,"teachers")
   clicker.dir = file.path(tgroup.dir,"clicker")
+  present.dir = file.path(shiny.dir,"present")
   log.dir = file.path(tgroup.dir,"log")
 
 
@@ -32,13 +33,18 @@ docker pull ", image,"
 ")
 
 
+  rstudio = if (use.rstudio) {
+    paste0("-p 8711:8787 -e ROOT=TRUE -e USER=admin -e PASSWORD=<yourpassword> -e RUN_RSTUDIO=yes")
+  } else {
+    "-e RUN_RSTUDIO=no"
+  }
 
   # teacherhub
   field = "teacherhub"
   name = opts[[field]]$container
   port = opts[[field]]$port
 
-  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ROOT=FALSE -e RUN_RSTUDIO=no -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/srv/tgroup -v ', log.dir,':/var/log/ ',image)
+  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ',rstudio,' -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/srv/tgroup -v ',teachers.dir,':/srv/teachers -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ ' ,image)
 
   code = c(code,"",paste0("# ", field), paste0("docker stop ", name),paste0("docker rm ", name), run.com)
 

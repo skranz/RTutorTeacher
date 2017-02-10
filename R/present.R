@@ -31,12 +31,13 @@ presenterApp = function(courseid="", slides.dir, token.dir,clicker.dir=NULL, ps.
   app
 }
 
-makePresenterAppDir = function(courseid="defaultcourse", app.base.dir, hash=random.string(1,127), slides.dir,token.dir = "",clicker.dir="", teacher="JohnDoe", del.old.app.dirs = TRUE) {
-
+makePresenterAppDir = function(courseid,slides,teacher, opts, hash=random.string(1,127),token.dir = "", del.old.app.dirs = TRUE) {
   restore.point("makePresenterAppDir")
   #stop()
 
-  app.dir = file.path(app.base.dir, hash[1])
+  app.base.dir = file.path(opts$present.shiny.dir,"teachers",teacher,"courses",courseid,"slides",slides)
+  app.dir = file.path(app.base.dir,hash[1])
+
   if (del.old.app.dirs) {
     dirs = setdiff(list.dirs(app.base.dir, recursive=FALSE),app.dir)
     for (dir in dirs) {
@@ -48,12 +49,14 @@ makePresenterAppDir = function(courseid="defaultcourse", app.base.dir, hash=rand
     dir.create(app.dir,recursive = TRUE)
   }
 
+  slides.dir = file.path(opts$teachers.dir,teacher,"courses",courseid,"slides",slides)
+
   code = paste0('
 # Automatically generated presentation app
 
-library("RTutor3")
+library("RTutorTeacher")
 slides.dir = "',slides.dir,'"
-clicker.dir = "',clicker.dir,'"
+clicker.dir = "',opts$clicker.dir,'"
 teacher = "', teacher,'"
 token.dir = "',token.dir,'"
 courseid = "',courseid,'"
