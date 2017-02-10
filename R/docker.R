@@ -44,7 +44,7 @@ docker pull ", image,"
   name = opts[[field]]$container
   port = opts[[field]]$port
 
-  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 -e ',rstudio,' -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/srv/tgroup -v ',teachers.dir,':/srv/teachers -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ ' ,image)
+  run.com = paste0('docker run -entrypoint="/usr/bin/with-contenv bash" --name ',name,' -d -p ',port,':3838 ',rstudio,' -v ',file.path(shiny.dir,field),':/srv/shiny-server/',field,' -v ',tgroup.dir,':/srv/tgroup -v ',teachers.dir,':/srv/teachers -v ', log.dir,':/var/log/ -v ', clicker.dir,':/srv/clicker/ ' ,image)
 
   code = c(code,"",paste0("# ", field), paste0("docker stop ", name),paste0("docker rm ", name), run.com)
 

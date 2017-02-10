@@ -63,8 +63,10 @@ TeacherHubApp = function(tgroup.dir, login.db.dir=NULL, app.title="RTutor Teache
 }
 
 init.th.opts = function(tgroup.dir, file = file.path(tgroup.dir,"settings/settings.yaml")) {
-  opts$tgroup.dir = tgroup.dir
+  restore.point("init.th.opts")
+
   opts = yaml.load_file(file)
+  opts$tgroup.dir = tgroup.dir
 
   if (isTRUE(opts$local)) {
     opts$base_url = "localhost"
